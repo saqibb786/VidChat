@@ -34,4 +34,6 @@ dependencies = [
     "tqdm>=4.66.0",
     "watchdog>=4.0.0",
     "yt-dlp>=2024.4.9",
+    "fastapi>=0.141.1",
+    "uvicorn>=0.52.1",
 ]
