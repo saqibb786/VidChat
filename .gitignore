@@ -6,8 +6,19 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
-.venv
+# Virtual environments & IDE
+.venv/
+.vscode/
+.idea/
 
-
+# Environment variables & secrets
 .env
+*.env
+
+# Runtime downloads & vector store database
+downloades/
+vector_db/
+*.wav
+*.mp3
+*.mp4
+*.m4a
