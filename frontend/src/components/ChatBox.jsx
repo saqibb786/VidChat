@@ -18,8 +18,7 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
 
   const handleChipClick = (promptText) => {
     if (isAsking || !sessionId) return;
-    onSendMessage(promptText);
-    setInputQuery('');
+    setInputQuery(promptText);
   };
 
   return (
