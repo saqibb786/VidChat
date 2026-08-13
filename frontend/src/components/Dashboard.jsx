@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FormattedText from './FormattedText';
 
 export default function Dashboard({ result }) {
   const [activeTab, setActiveTab] = useState('summary');
@@ -52,7 +53,9 @@ export default function Dashboard({ result }) {
         {activeTab === 'summary' && (
           <div className="glass-card" style={{ minHeight: '360px' }}>
             <div className="card-title">📋 Meeting Summary</div>
-            <div className="card-body">{result.summary}</div>
+            <div className="card-body">
+              <FormattedText content={result.summary} />
+            </div>
           </div>
         )}
 
@@ -61,17 +64,23 @@ export default function Dashboard({ result }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div className="glass-card" style={{ borderTop: '3px solid var(--accent-emerald)' }}>
                 <div className="card-title" style={{ color: 'var(--accent-emerald)' }}>✅ Action Items</div>
-                <div className="card-body">{result.action_items}</div>
+                <div className="card-body">
+                  <FormattedText content={result.action_items} />
+                </div>
               </div>
               <div className="glass-card" style={{ borderTop: '3px solid var(--accent-cyan)' }}>
                 <div className="card-title" style={{ color: 'var(--accent-cyan)' }}>🔑 Key Decisions</div>
-                <div className="card-body">{result.key_decisions}</div>
+                <div className="card-body">
+                  <FormattedText content={result.key_decisions} />
+                </div>
               </div>
             </div>
 
             <div className="glass-card" style={{ borderTop: '3px solid var(--accent-amber)' }}>
               <div className="card-title" style={{ color: 'var(--accent-amber)' }}>❓ Open Questions & Follow-ups</div>
-              <div className="card-body">{result.open_questions}</div>
+              <div className="card-body">
+                <FormattedText content={result.open_questions} />
+              </div>
             </div>
           </div>
         )}

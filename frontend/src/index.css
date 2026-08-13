@@ -240,7 +240,39 @@ body {
   font-size: 0.88rem;
   line-height: 1.6;
   color: var(--text-primary);
-  white-space: pre-line;
+}
+
+/* Formatted Markdown Typography */
+.formatted-markdown p {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.formatted-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.formatted-markdown strong, .formatted-markdown b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.formatted-markdown ul, .formatted-markdown ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.formatted-markdown li {
+  margin-bottom: 0.35rem;
+  line-height: 1.5;
+}
+
+.formatted-markdown h1, .formatted-markdown h2, .formatted-markdown h3, .formatted-markdown h4 {
+  font-family: 'Syne', sans-serif;
+  color: var(--accent-cyan);
+  margin-top: 0.6rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
 }
 
 /* Navigation Tabs */

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import FormattedText from './FormattedText';
 
 export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionId }) {
   const [inputQuery, setInputQuery] = useState('');
@@ -16,11 +17,6 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
     setInputQuery('');
   };
 
-  const handleChipClick = (promptText) => {
-    if (isAsking || !sessionId) return;
-    setInputQuery(promptText);
-  };
-
   return (
     <div className="col-chat">
       <div className="chat-card">
@@ -32,34 +28,6 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
           <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontFamily: 'JetBrains Mono, monospace' }}>
             RAG Active
           </span>
-        </div>
-
-        {/* Suggested Template Chips (Fixed Instant Action) */}
-        <div className="chip-list">
-          <button
-            type="button"
-            className="chip-btn"
-            onClick={() => handleChipClick("What are the top 3 key takeaways from this meeting?")}
-            disabled={isAsking || !sessionId}
-          >
-            📋 Top Takeaways
-          </button>
-          <button
-            type="button"
-            className="chip-btn"
-            onClick={() => handleChipClick("List all action items and who is responsible for them.")}
-            disabled={isAsking || !sessionId}
-          >
-            ✅ Action Items
-          </button>
-          <button
-            type="button"
-            className="chip-btn"
-            onClick={() => handleChipClick("What key decisions were reached during this discussion?")}
-            disabled={isAsking || !sessionId}
-          >
-            🔑 Key Decisions
-          </button>
         </div>
 
         {/* Chat History Messages */}
@@ -77,7 +45,12 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
                 key={index}
                 className={msg.role === 'user' ? 'chat-msg-user' : 'chat-msg-bot'}
               >
-                <b>{msg.role === 'user' ? 'You:' : '🤖 Assistant:'}</b> {msg.content}
+                <b>{msg.role === 'user' ? 'You:' : '🤖 Assistant:'}</b>
+                {msg.role === 'user' ? (
+                  <span> {msg.content}</span>
+                ) : (
+                  <FormattedText content={msg.content} />
+                )}
               </div>
             ))
           )}
