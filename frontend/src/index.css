@@ -47,6 +47,37 @@ body {
   flex-direction: column;
   gap: 1.25rem;
   flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.sidebar.collapsed {
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  border-right: none !important;
+}
+
+/* Icon Toggle Buttons */
+.icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #ffffff;
 }
 
 .brand-title {
@@ -80,7 +111,7 @@ body {
   letter-spacing: 0.05em;
 }
 
-.form-input, .form-select {
+.form-input {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--panel-border);
   border-radius: 8px;
@@ -90,6 +121,25 @@ body {
   font-size: 0.82rem;
   outline: none;
   transition: all 0.2s;
+}
+
+.form-select {
+  background-color: #12141d !important;
+  color: #ffffff !important;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.form-select option {
+  background-color: #12141d !important;
+  color: #ffffff !important;
+  padding: 0.5rem;
 }
 
 .form-input:focus, .form-select:focus {

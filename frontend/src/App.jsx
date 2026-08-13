@@ -11,10 +11,15 @@ export default function App() {
   const [language, setLanguage] = useState('english');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [steps, setSteps] = useState({});
   const [result, setResult] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => !prev);
+  };
 
   const handleAnalyze = async (e) => {
     e?.preventDefault();
@@ -111,11 +116,17 @@ export default function App() {
         onAnalyze={handleAnalyze}
         isProcessing={isProcessing}
         steps={steps}
+        isCollapsed={isSidebarCollapsed}
+        onToggleSidebar={toggleSidebar}
       />
 
       {/* Main Workspace Area */}
       <div className="content-area">
-        <Header isProcessing={isProcessing} />
+        <Header
+          isProcessing={isProcessing}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
+        />
 
         {errorMsg && (
           <div className="glass-card" style={{ borderLeft: '4px solid #ef4444', color: '#f87171' }}>

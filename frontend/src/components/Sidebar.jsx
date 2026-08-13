@@ -1,6 +1,7 @@
 import React from 'react';
+import { PanelLeftClose } from 'lucide-react';
 
-export default function Sidebar({ source, setSource, language, setLanguage, onAnalyze, isProcessing, steps }) {
+export default function Sidebar({ source, setSource, language, setLanguage, onAnalyze, isProcessing, steps, isCollapsed, onToggleSidebar }) {
   const stepItems = [
     { key: 'audio', label: '🔊 Audio Processing' },
     { key: 'transcript', label: '📝 Transcription' },
@@ -10,10 +11,20 @@ export default function Sidebar({ source, setSource, language, setLanguage, onAn
   ];
 
   return (
-    <div className="sidebar">
-      <div>
-        <div className="brand-title">🎬 VidChat</div>
-        <div className="brand-subtitle">Meeting Intelligence</div>
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div className="brand-title">🎬 VidChat</div>
+          <div className="brand-subtitle">Meeting Intelligence</div>
+        </div>
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={onToggleSidebar}
+          title="Collapse Sidebar"
+        >
+          <PanelLeftClose size={18} />
+        </button>
       </div>
 
       <hr style={{ borderColor: 'var(--panel-border)', borderStyle: 'solid' }} />
