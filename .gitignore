@@ -23,6 +23,7 @@ frontend/dist/
 # Runtime downloads & vector store database
 downloades/
 vector_db/
+backend/data/
 *.wav
 *.mp3
 *.mp4

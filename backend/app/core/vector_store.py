@@ -4,7 +4,9 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
-CHROMA_DIR = "vector_db"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+CHROMA_DIR = os.path.join(BASE_DIR, "data", "vector_db")
+os.makedirs(CHROMA_DIR, exist_ok=True)
 COLLECTION_NAME = "meeting_transcript"
 EMBEDDING_MODEL  = "all-MiniLM-L6-v2"
 
