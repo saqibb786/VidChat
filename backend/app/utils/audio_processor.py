@@ -5,9 +5,9 @@ import os
 DOWNLOAD_DIR = 'downloades'
 os.makedirs(DOWNLOAD_DIR,exist_ok = True)
 
-def download_youtube_audio(url :str) ->str:
+def download_youtube_audio(url: str) -> str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
-    ydl_opts = {
+    base_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_path,
         "postprocessors": [
@@ -18,11 +18,40 @@ def download_youtube_audio(url :str) ->str:
             }
         ],
         "quiet": True,
+        "nocheckcertificate": True,
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
-    return filename
+
+    # Attempt 1: Try pulling cookies from local browsers (Chrome, Edge, Firefox, Brave)
+    browsers = ["chrome", "edge", "firefox", "brave"]
+    for browser in browsers:
+        try:
+            opts = {**base_opts, "cookiesfrombrowser": (browser,)}
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
+                return filename
+        except Exception:
+            continue
+
+    # Attempt 2: Standard download with client rotation
+    try:
+        opts = {
+            **base_opts,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "ios", "mweb", "web"]
+                }
+            },
+        }
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
+            return filename
+    except Exception as e:
+        raise RuntimeError(
+            "YouTube restricted access ('Sign in to confirm you are not a bot'). "
+            "Please try another video URL or paste a local audio/video file path."
+        )
 
 
 
