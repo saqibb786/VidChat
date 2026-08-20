@@ -24,6 +24,7 @@ frontend/dist/
 downloades/
 vector_db/
 backend/data/
+temp/
 *.wav
 *.mp3
 *.mp4
