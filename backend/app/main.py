@@ -1,5 +1,4 @@
 import os
-import uuid
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -8,13 +7,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from .utils.audio_processor import process_input
-from .core.transcriber import transcribe_all
-from .core.summarizer import summarize, generate_title
-from .core.extractor import extract_action_items, extract_key_decisions, extract_questions
-from .core.rag_engine import build_rag_chain, ask_question
+from .core.ingestion_service import IngestionManager
+from .core.rag_engine import ask_question
 
-app = FastAPI(title="VidChat API", version="1.0.0")
+app = FastAPI(title="VidChat API", version="1.1.0")
 
 # Enable CORS for React frontend (Vite port 5173)
 app.add_middleware(
@@ -31,6 +27,7 @@ sessions = {}
 class AnalyzeRequest(BaseModel):
     source: str
     language: str = "english"
+    engine: str = "local"  # "local" or "adversal"
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -46,26 +43,20 @@ def analyze_video(req: AnalyzeRequest):
         raise HTTPException(status_code=400, detail="Source URL or file path is required")
     
     try:
-        chunks = process_input(req.source.strip())
-        transcript = transcribe_all(chunks, req.language)
-        title = generate_title(transcript)
-        summary_text = summarize(transcript)
-        action_items = extract_action_items(transcript)
-        decisions = extract_key_decisions(transcript)
-        questions = extract_questions(transcript)
-        rag_chain = build_rag_chain(transcript)
-        
-        session_id = str(uuid.uuid4())
-        sessions[session_id] = rag_chain
+        result = IngestionManager.process(req.source.strip(), req.language, req.engine)
+        sessions[result["session_id"]] = result["rag_chain"]
         
         return {
-            "session_id": session_id,
-            "title": title,
-            "transcript": transcript,
-            "summary": summary_text,
-            "action_items": action_items,
-            "key_decisions": decisions,
-            "open_questions": questions
+            "session_id": result["session_id"],
+            "engine": result["engine"],
+            "title": result["title"],
+            "transcript": result["transcript"],
+            "summary": result["summary"],
+            "action_items": result["action_items"],
+            "key_decisions": result["key_decisions"],
+            "open_questions": result["open_questions"],
+            "images": result.get("images", []),
+            "fallback_warning": result.get("fallback_warning")
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

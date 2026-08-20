@@ -9,6 +9,7 @@ const API_BASE_URL = 'http://localhost:8000/api';
 export default function App() {
   const [source, setSource] = useState('');
   const [language, setLanguage] = useState('english');
+  const [engine, setEngine] = useState('local');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -16,6 +17,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [warningMsg, setWarningMsg] = useState('');
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed((prev) => !prev);
@@ -27,6 +29,7 @@ export default function App() {
 
     setIsProcessing(true);
     setErrorMsg('');
+    setWarningMsg('');
     setResult(null);
     setChatHistory([]);
     setSteps({
@@ -41,7 +44,7 @@ export default function App() {
       const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: source.trim(), language }),
+        body: JSON.stringify({ source: source.trim(), language, engine }),
       });
 
       if (!response.ok) {
@@ -58,6 +61,10 @@ export default function App() {
         rag: 'done',
       });
       setResult(data);
+
+      if (data.fallback_warning) {
+        setWarningMsg(data.fallback_warning);
+      }
     } catch (err) {
       setErrorMsg(err.message);
       setSteps({
@@ -113,6 +120,8 @@ export default function App() {
         setSource={setSource}
         language={language}
         setLanguage={setLanguage}
+        engine={engine}
+        setEngine={setEngine}
         onAnalyze={handleAnalyze}
         isProcessing={isProcessing}
         steps={steps}
@@ -128,8 +137,14 @@ export default function App() {
           onToggleSidebar={toggleSidebar}
         />
 
+        {warningMsg && (
+          <div className="glass-card" style={{ borderLeft: '4px solid #f59e0b', color: '#fbbf24', marginBottom: '0.75rem' }}>
+            ⚠️ {warningMsg}
+          </div>
+        )}
+
         {errorMsg && (
-          <div className="glass-card" style={{ borderLeft: '4px solid #ef4444', color: '#f87171' }}>
+          <div className="glass-card" style={{ borderLeft: '4px solid #ef4444', color: '#f87171', marginBottom: '0.75rem' }}>
             ⚠️ {errorMsg}
           </div>
         )}
@@ -151,10 +166,10 @@ export default function App() {
               Welcome to VidChat
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '480px', margin: '0 auto 2rem auto', lineHeight: '1.6' }}>
-              Enter a YouTube video URL or local media file in the sidebar to generate automated meeting summaries, action items, and chat with your transcript.
+              Select your Ingestion Engine (Local or Adversal Cloud) and enter a YouTube URL or local file path to generate summaries and chat with your meeting.
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <span className="badge-tag">⚡ Automated Speech-to-Text</span>
+              <span className="badge-tag">⚡ Dual Engine (Local / Cloud MCP)</span>
               <span className="badge-tag">📋 Map-Reduce Summaries</span>
               <span className="badge-tag">💬 Real-time RAG Q&A</span>
             </div>

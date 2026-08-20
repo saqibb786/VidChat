@@ -1,10 +1,22 @@
 import React from 'react';
 import { PanelLeftClose } from 'lucide-react';
 
-export default function Sidebar({ source, setSource, language, setLanguage, onAnalyze, isProcessing, steps, isCollapsed, onToggleSidebar }) {
+export default function Sidebar({
+  source,
+  setSource,
+  language,
+  setLanguage,
+  engine,
+  setEngine,
+  onAnalyze,
+  isProcessing,
+  steps,
+  isCollapsed,
+  onToggleSidebar
+}) {
   const stepItems = [
-    { key: 'audio', label: '🔊 Audio Processing' },
-    { key: 'transcript', label: '📝 Transcription' },
+    { key: 'audio', label: '🔊 Media Ingestion' },
+    { key: 'transcript', label: '📝 Speech / AI Extraction' },
     { key: 'title', label: '🏷️ Title & Summary' },
     { key: 'extract', label: '🔍 Insight Extraction' },
     { key: 'rag', label: '🧠 Vector RAG Engine' },
@@ -40,6 +52,19 @@ export default function Sidebar({ source, setSource, language, setLanguage, onAn
             onChange={(e) => setSource(e.target.value)}
             disabled={isProcessing}
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Ingestion Engine</label>
+          <select
+            className="form-select"
+            value={engine}
+            onChange={(e) => setEngine(e.target.value)}
+            disabled={isProcessing}
+          >
+            <option value="local">Local Pipeline (Whisper / Sarvam)</option>
+            <option value="adversal">Adversal.ai Cloud (Remote MCP)</option>
+          </select>
         </div>
 
         <div className="form-group">
