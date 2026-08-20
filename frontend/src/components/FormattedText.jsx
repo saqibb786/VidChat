@@ -8,6 +8,19 @@ export default function FormattedText({ content }) {
     <div className="formatted-markdown">
       <ReactMarkdown
         components={{
+          a: ({ node, ...props }) => (
+            <a
+              {...props}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: 'var(--accent-cyan)',
+                textDecoration: 'underline',
+                fontWeight: 600,
+                wordBreak: 'break-word'
+              }}
+            />
+          ),
           img: ({ node, ...props }) => (
             <span style={{ display: 'block', margin: '0.75rem 0', textAlign: 'center' }}>
               <img
