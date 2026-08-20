@@ -12,7 +12,7 @@ export default function App() {
   const [engine, setEngine] = useState('local');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [steps, setSteps] = useState({});
   const [result, setResult] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
@@ -27,8 +27,6 @@ export default function App() {
     e?.preventDefault();
     if (!source.trim() || isProcessing) return;
 
-    // Automatically collapse sidebar on mobile when processing starts
-    setIsSidebarCollapsed(true);
     setIsProcessing(true);
     setErrorMsg('');
     setWarningMsg('');
@@ -116,25 +114,22 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Mobile Drawer Overlay Backdrop */}
-      {!isSidebarCollapsed && (
-        <div className="mobile-overlay" onClick={toggleSidebar} />
-      )}
-
-      {/* Left Sidebar Control Panel */}
-      <Sidebar
-        source={source}
-        setSource={setSource}
-        language={language}
-        setLanguage={setLanguage}
-        engine={engine}
-        setEngine={setEngine}
-        onAnalyze={handleAnalyze}
-        isProcessing={isProcessing}
-        steps={steps}
-        isCollapsed={isSidebarCollapsed}
-        onToggleSidebar={toggleSidebar}
-      />
+      {/* Left Sidebar Control Panel (Desktop Only) */}
+      <div className="desktop-sidebar-container">
+        <Sidebar
+          source={source}
+          setSource={setSource}
+          language={language}
+          setLanguage={setLanguage}
+          engine={engine}
+          setEngine={setEngine}
+          onAnalyze={handleAnalyze}
+          isProcessing={isProcessing}
+          steps={steps}
+          isCollapsed={isSidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
+        />
+      </div>
 
       {/* Main Workspace Area */}
       <div className="content-area">
@@ -144,14 +139,32 @@ export default function App() {
           onToggleSidebar={toggleSidebar}
         />
 
+        {/* Inline Mobile Processing Controls Panel (< 768px) */}
+        <div className="mobile-controls-container">
+          <Sidebar
+            source={source}
+            setSource={setSource}
+            language={language}
+            setLanguage={setLanguage}
+            engine={engine}
+            setEngine={setEngine}
+            onAnalyze={handleAnalyze}
+            isProcessing={isProcessing}
+            steps={steps}
+            isCollapsed={false}
+            onToggleSidebar={() => {}}
+            isMobileInline={true}
+          />
+        </div>
+
         {warningMsg && (
-          <div className="glass-card" style={{ borderLeft: '4px solid #f59e0b', color: '#fbbf24', marginBottom: '0.75rem' }}>
+          <div className="glass-card" style={{ borderLeft: '4px solid #f59e0b', color: '#fbbf24' }}>
             ⚠️ {warningMsg}
           </div>
         )}
 
         {errorMsg && (
-          <div className="glass-card" style={{ borderLeft: '4px solid #ef4444', color: '#f87171', marginBottom: '0.75rem' }}>
+          <div className="glass-card" style={{ borderLeft: '4px solid #ef4444', color: '#f87171' }}>
             ⚠️ {errorMsg}
           </div>
         )}
@@ -167,15 +180,15 @@ export default function App() {
             />
           </div>
         ) : (
-          <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem 1.5rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🎬</div>
-            <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
+          <div className="glass-card welcome-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem 1.25rem' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎬</div>
+            <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginBottom: '0.4rem' }}>
               Welcome to VidChat
             </div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '480px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', maxWidth: '480px', margin: '0 auto 1.25rem auto', lineHeight: '1.5' }}>
               Select your Ingestion Engine (Local or Adversal Cloud) and enter a YouTube URL or local file path to generate summaries and chat with your video.
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', justifyContent: 'center' }}>
               <span className="badge-tag">⚡ Dual Engine</span>
               <span className="badge-tag">📋 Map-Reduce</span>
               <span className="badge-tag">💬 Real-time RAG</span>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { PanelLeftClose, UploadCloud, FileVideo, CheckCircle2 } from 'lucide-react';
+import { PanelLeftClose, UploadCloud, CheckCircle2 } from 'lucide-react';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -14,7 +14,8 @@ export default function Sidebar({
   isProcessing,
   steps,
   isCollapsed,
-  onToggleSidebar
+  onToggleSidebar,
+  isMobileInline = false
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -83,26 +84,39 @@ export default function Sidebar({
     }
   };
 
+  const containerClass = isMobileInline
+    ? 'mobile-inline-card'
+    : `sidebar ${isCollapsed ? 'collapsed' : ''}`;
+
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <div className="brand-title">🎬 VidChat</div>
-          <div className="brand-subtitle">AI Video & Audio Assistant</div>
+    <div className={containerClass}>
+      {!isMobileInline && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div className="brand-title">🎬 VidChat</div>
+              <div className="brand-subtitle">AI Video & Audio Assistant</div>
+            </div>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={onToggleSidebar}
+              title="Collapse Sidebar"
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          </div>
+          <hr style={{ borderColor: 'var(--panel-border)', borderStyle: 'solid' }} />
+        </>
+      )}
+
+      {isMobileInline && (
+        <div className="card-title" style={{ color: 'var(--accent-purple)', marginBottom: '0.65rem' }}>
+          ⚙️ Video Processing Controls
         </div>
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={onToggleSidebar}
-          title="Collapse Sidebar"
-        >
-          <PanelLeftClose size={18} />
-        </button>
-      </div>
+      )}
 
-      <hr style={{ borderColor: 'var(--panel-border)', borderStyle: 'solid' }} />
-
-      <form onSubmit={onAnalyze} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <form onSubmit={onAnalyze} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
         <div className="form-group">
           <label className="form-label">Media Source</label>
           <input
@@ -126,7 +140,7 @@ export default function Sidebar({
             style={{
               border: `2px dashed ${isDragging ? 'var(--accent-purple)' : 'var(--panel-border)'}`,
               borderRadius: '10px',
-              padding: '1rem 0.75rem',
+              padding: '0.75rem 0.6rem',
               textAlign: 'center',
               background: isDragging ? 'rgba(139, 92, 246, 0.12)' : 'rgba(255, 255, 255, 0.02)',
               cursor: isProcessing || isUploading ? 'not-allowed' : 'pointer',
@@ -142,52 +156,54 @@ export default function Sidebar({
               disabled={isProcessing || isUploading}
             />
             {isUploading ? (
-              <div style={{ fontSize: '0.82rem', color: 'var(--accent-cyan)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
                 ⚡ Uploading {uploadedFileName}...
               </div>
             ) : source && uploadedFileName ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--accent-emerald)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--accent-emerald)' }}>
                 <CheckCircle2 size={16} />
-                <span>{uploadedFileName}</span>
+                <span style={{ wordBreak: 'break-all' }}>{uploadedFileName}</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
-                <UploadCloud size={24} style={{ color: 'var(--accent-purple)' }} />
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                <UploadCloud size={20} style={{ color: 'var(--accent-purple)' }} />
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Drag & drop video file here
                 </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                  or click to browse (.mp4, .mov, .mp3, .wav)
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                  or click to browse (.mp4, .mov, .mp3)
                 </span>
               </div>
             )}
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Ingestion Engine</label>
-          <select
-            className="form-select"
-            value={engine}
-            onChange={(e) => setEngine(e.target.value)}
-            disabled={isProcessing || isUploading}
-          >
-            <option value="local">Local Pipeline (Whisper / Sarvam)</option>
-            <option value="adversal">Adversal.ai Cloud (Remote MCP)</option>
-          </select>
-        </div>
+        <div className="mobile-controls-row">
+          <div className="form-group flex-1">
+            <label className="form-label">Ingestion Engine</label>
+            <select
+              className="form-select"
+              value={engine}
+              onChange={(e) => setEngine(e.target.value)}
+              disabled={isProcessing || isUploading}
+            >
+              <option value="local">Local Pipeline (Whisper / Sarvam)</option>
+              <option value="adversal">Adversal.ai Cloud (Remote MCP)</option>
+            </select>
+          </div>
 
-        <div className="form-group">
-          <label className="form-label">Language Mode</label>
-          <select
-            className="form-select"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            disabled={isProcessing || isUploading}
-          >
-            <option value="english">English (OpenAI Whisper)</option>
-            <option value="hinglish">Hinglish (Sarvam AI STT)</option>
-          </select>
+          <div className="form-group flex-1">
+            <label className="form-label">Language Mode</label>
+            <select
+              className="form-select"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              disabled={isProcessing || isUploading}
+            >
+              <option value="english">English (OpenAI Whisper)</option>
+              <option value="hinglish">Hinglish (Sarvam AI STT)</option>
+            </select>
+          </div>
         </div>
 
         <button type="submit" className="btn-primary" disabled={isProcessing || isUploading || !source.trim()}>
@@ -197,7 +213,7 @@ export default function Sidebar({
 
       {Object.keys(steps).length > 0 && (
         <div style={{ marginTop: '0.5rem' }}>
-          <div className="form-label" style={{ marginBottom: '0.5rem' }}>Pipeline Progress</div>
+          <div className="form-label" style={{ marginBottom: '0.4rem' }}>Pipeline Progress</div>
           <div className="status-list">
             {stepItems.map((step) => {
               const status = steps[step.key] || 'pending';
