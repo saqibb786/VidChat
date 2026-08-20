@@ -461,3 +461,63 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+/* Responsive Media Queries for Mobile & Tablet */
+@media (max-width: 900px) {
+  body {
+    height: auto !important;
+    overflow-y: auto !important;
+  }
+
+  .app-container {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    position: relative !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--panel-border) !important;
+    padding: 1rem !important;
+  }
+
+  .sidebar.collapsed {
+    display: none !important;
+  }
+
+  .content-area {
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0.75rem !important;
+  }
+
+  .workspace-grid {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .col-dash, .col-chat {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .tabs-header {
+    flex-wrap: wrap !important;
+  }
+
+  .tab-btn {
+    font-size: 0.75rem !important;
+    padding: 0.45rem 0.5rem !important;
+  }
+
+  .chat-card {
+    min-height: 480px !important;
+  }
+
+  .chat-msg-user, .chat-msg-bot {
+    max-width: 95% !important;
+  }
+}

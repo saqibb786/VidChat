@@ -61,7 +61,7 @@ export default function Dashboard({ result }) {
 
         {activeTab === 'insights' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem' }}>
               <div className="glass-card" style={{ borderTop: '3px solid var(--accent-emerald)' }}>
                 <div className="card-title" style={{ color: 'var(--accent-emerald)' }}>✅ Action Items</div>
                 <div className="card-body">
