@@ -12,7 +12,7 @@ export default function App() {
   const [engine, setEngine] = useState('local');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [steps, setSteps] = useState({});
   const [result, setResult] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
@@ -27,6 +27,8 @@ export default function App() {
     e?.preventDefault();
     if (!source.trim() || isProcessing) return;
 
+    // Automatically collapse sidebar on mobile when processing starts
+    setIsSidebarCollapsed(true);
     setIsProcessing(true);
     setErrorMsg('');
     setWarningMsg('');
@@ -114,6 +116,11 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile Drawer Overlay Backdrop */}
+      {!isSidebarCollapsed && (
+        <div className="mobile-overlay" onClick={toggleSidebar} />
+      )}
+
       {/* Left Sidebar Control Panel */}
       <Sidebar
         source={source}
@@ -160,18 +167,18 @@ export default function App() {
             />
           </div>
         ) : (
-          <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '3rem' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎬</div>
-            <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
+          <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem 1.5rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🎬</div>
+            <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
               Welcome to VidChat
             </div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '480px', margin: '0 auto 2rem auto', lineHeight: '1.6' }}>
-              Select your Ingestion Engine (Local or Adversal Cloud) and enter a YouTube URL or local file path to generate summaries and chat with your meeting.
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '480px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
+              Select your Ingestion Engine (Local or Adversal Cloud) and enter a YouTube URL or local file path to generate summaries and chat with your video.
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <span className="badge-tag">⚡ Dual Engine (Local / Cloud MCP)</span>
-              <span className="badge-tag">📋 Map-Reduce Summaries</span>
-              <span className="badge-tag">💬 Real-time RAG Q&A</span>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <span className="badge-tag">⚡ Dual Engine</span>
+              <span className="badge-tag">📋 Map-Reduce</span>
+              <span className="badge-tag">💬 Real-time RAG</span>
             </div>
           </div>
         )}
