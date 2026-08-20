@@ -35,7 +35,10 @@ async def run_adversal_pipeline_async(source: str, output_dir: str, timeout_seco
                 "images": "minimal"
             }
             if source.startswith("http://") or source.startswith("https://"):
-                args["video_url"] = source
+                logger.info("Pre-downloading YouTube video using VidChat robust handler...")
+                from ..utils.audio_processor import download_youtube_video
+                local_video = download_youtube_video(source)
+                args["video_path"] = os.path.abspath(local_video)
             else:
                 args["video_path"] = os.path.abspath(source)
 
