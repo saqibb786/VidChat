@@ -10,7 +10,7 @@ export default function Dashboard({ result }) {
     const element = document.createElement("a");
     const file = new Blob([result.transcript], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
-    element.download = "meeting_transcript.txt";
+    element.download = "video_transcript.txt";
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -52,7 +52,7 @@ export default function Dashboard({ result }) {
       <div className="tab-content">
         {activeTab === 'summary' && (
           <div className="glass-card" style={{ minHeight: '360px' }}>
-            <div className="card-title">📋 Meeting Summary</div>
+            <div className="card-title">📋 Video Summary</div>
             <div className="card-body">
               <FormattedText content={result.summary} />
             </div>

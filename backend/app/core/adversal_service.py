@@ -91,9 +91,12 @@ def run_adversal_pipeline(source: str, output_dir: str, timeout_seconds: int = 3
     """Synchronous wrapper for run_adversal_pipeline_async"""
     return asyncio.run(run_adversal_pipeline_async(source, output_dir, timeout_seconds))
 
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 def parse_adversal_notes(output_dir: str) -> dict:
     """
     Parses generated notes.md and associated images from output_dir into structured dictionary.
+    Rewrites relative image markdown tags to point to static backend server URLs.
     """
     notes_path = os.path.join(output_dir, "notes.md")
     if not os.path.exists(notes_path):
@@ -101,6 +104,28 @@ def parse_adversal_notes(output_dir: str) -> dict:
 
     with open(notes_path, "r", encoding="utf-8") as f:
         content = f.read()
+
+    # Calculate static URL base relative to BASE_DIR/data
+    data_dir = os.path.join(BASE_DIR, "data")
+    rel_path = os.path.relpath(output_dir, data_dir).replace("\\", "/")
+    static_url_prefix = f"http://localhost:8000/static/{rel_path}"
+
+    # Rewrite ![alt](image_path) tags to http://localhost:8000/static/...
+    def replace_img(match):
+        alt = match.group(1)
+        src = match.group(2).replace("\\", "/")
+        if src.startswith("http://") or src.startswith("https://"):
+            return f"![{alt}]({src})"
+        
+        filename = os.path.basename(src)
+        if os.path.exists(os.path.join(output_dir, "img", filename)):
+            return f"![{alt}]({static_url_prefix}/img/{filename})"
+        elif os.path.exists(os.path.join(output_dir, filename)):
+            return f"![{alt}]({static_url_prefix}/{filename})"
+        else:
+            return f"![{alt}]({static_url_prefix}/{src})"
+
+    content = re.sub(r"!\[(.*?)\]\((.*?)\)", replace_img, content)
 
     # Discover images inside output_dir or output_dir/img
     images = []
