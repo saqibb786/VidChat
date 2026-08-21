@@ -3,7 +3,6 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import ChatBox from './components/ChatBox';
-
 import { API_BASE_URL } from './config';
 
 export default function App() {
@@ -21,6 +20,61 @@ export default function App() {
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed((prev) => !prev);
+  };
+
+  const pollJobStatus = async (jobId) => {
+    let tickCount = 0;
+    const pollInterval = setInterval(async () => {
+      tickCount += 1;
+      try {
+        const res = await fetch(`${API_BASE_URL}/job-status/${jobId}`);
+        if (!res.ok) {
+          clearInterval(pollInterval);
+          throw new Error('Failed to check job status');
+        }
+        const data = await res.json();
+        
+        if (data.status === 'completed') {
+          clearInterval(pollInterval);
+          setSteps({
+            audio: 'done',
+            transcript: 'done',
+            title: 'done',
+            extract: 'done',
+            rag: 'done',
+          });
+          setResult(data.result);
+          if (data.result.fallback_warning) {
+            setWarningMsg(data.result.fallback_warning);
+          }
+          setIsProcessing(false);
+        } else if (data.status === 'failed') {
+          clearInterval(pollInterval);
+          setErrorMsg(data.error || 'Processing failed');
+          setSteps({
+            audio: 'pending',
+            transcript: 'pending',
+            title: 'pending',
+            extract: 'pending',
+            rag: 'pending',
+          });
+          setIsProcessing(false);
+        } else {
+          // Dynamic pipeline progress step animation
+          setSteps({
+            audio: 'done',
+            transcript: tickCount > 3 ? 'done' : 'active',
+            title: tickCount > 6 ? 'done' : tickCount > 3 ? 'active' : 'pending',
+            extract: tickCount > 9 ? 'done' : tickCount > 6 ? 'active' : 'pending',
+            rag: tickCount > 9 ? 'active' : 'pending',
+          });
+        }
+      } catch (err) {
+        clearInterval(pollInterval);
+        setErrorMsg(err.message);
+        setIsProcessing(false);
+      }
+    }, 2500);
   };
 
   const handleAnalyze = async (e) => {
@@ -41,7 +95,7 @@ export default function App() {
     });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const response = await fetch(`${API_BASE_URL}/analyze-job`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: source.trim(), language, engine }),
@@ -49,24 +103,16 @@ export default function App() {
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.detail || 'Analysis failed');
+        throw new Error(errData.detail || 'Analysis job submission failed');
       }
 
       const data = await response.json();
-      setSteps({
-        audio: 'done',
-        transcript: 'done',
-        title: 'done',
-        extract: 'done',
-        rag: 'done',
-      });
-      setResult(data);
-
-      if (data.fallback_warning) {
-        setWarningMsg(data.fallback_warning);
+      if (data.job_id) {
+        pollJobStatus(data.job_id);
       }
     } catch (err) {
       setErrorMsg(err.message);
+      setIsProcessing(false);
       setSteps({
         audio: 'pending',
         transcript: 'pending',
@@ -74,8 +120,6 @@ export default function App() {
         extract: 'pending',
         rag: 'pending',
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 

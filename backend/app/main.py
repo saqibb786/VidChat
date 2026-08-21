@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File
+import uuid
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -12,7 +13,7 @@ from .core.ingestion_service import IngestionManager
 from .core.rag_engine import ask_question
 from .utils.audio_processor import BASE_DIR, DOWNLOAD_DIR
 
-app = FastAPI(title="VidChat API", version="1.2.0")
+app = FastAPI(title="VidChat API", version="1.3.0")
 
 # Enable CORS for React frontend (Vite port 5173)
 app.add_middleware(
@@ -28,8 +29,9 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=DATA_DIR), name="static")
 
-# In-memory store for active session RAG chains
+# In-memory store for active session RAG chains and background jobs
 sessions = {}
+jobs = {}
 
 class AnalyzeRequest(BaseModel):
     source: str
@@ -57,6 +59,45 @@ async def upload_media_file(file: UploadFile = File(...)):
         return {"filepath": file_path, "filename": file.filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@app.post("/api/analyze-job")
+def analyze_video_job(req: AnalyzeRequest, background_tasks: BackgroundTasks):
+    if not req.source.strip():
+        raise HTTPException(status_code=400, detail="Source URL or file path is required")
+    
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {"status": "processing", "step": "audio", "result": None, "error": None}
+    
+    def process_background_job(j_id: str, source_str: str, lang: str, eng: str):
+        try:
+            result = IngestionManager.process(source_str, lang, eng)
+            sessions[result["session_id"]] = result["rag_chain"]
+            
+            jobs[j_id]["status"] = "completed"
+            jobs[j_id]["result"] = {
+                "session_id": result["session_id"],
+                "engine": result["engine"],
+                "title": result["title"],
+                "transcript": result["transcript"],
+                "summary": result["summary"],
+                "action_items": result["action_items"],
+                "key_decisions": result["key_decisions"],
+                "open_questions": result["open_questions"],
+                "images": result.get("images", []),
+                "fallback_warning": result.get("fallback_warning")
+            }
+        except Exception as e:
+            jobs[j_id]["status"] = "failed"
+            jobs[j_id]["error"] = str(e)
+
+    background_tasks.add_task(process_background_job, job_id, req.source.strip(), req.language, req.engine)
+    return {"job_id": job_id, "status": "processing"}
+
+@app.get("/api/job-status/{job_id}")
+def get_job_status(job_id: str):
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return jobs[job_id]
 
 @app.post("/api/analyze")
 def analyze_video(req: AnalyzeRequest):
