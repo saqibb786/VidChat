@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import ChatBox from './components/ChatBox';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+import { API_BASE_URL } from './config';
 
 export default function App() {
   const [source, setSource] = useState('');
