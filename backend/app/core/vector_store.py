@@ -1,6 +1,5 @@
 import os 
 from langchain_chroma import Chroma 
-from langchain_mistralai import MistralAIEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
@@ -12,9 +11,6 @@ COLLECTION_NAME = "meeting_transcript"
 EMBEDDING_MODEL  = "all-MiniLM-L6-v2"
 
 def get_embeddings():
-    api_key = os.getenv("MISTRAL_API_KEY")
-    if api_key and api_key.strip():
-        return MistralAIEmbeddings(api_key=api_key.strip())
     return HuggingFaceEmbeddings(
         model_name = EMBEDDING_MODEL,
         model_kwargs = {"device" : 'cpu'}
@@ -44,8 +40,6 @@ def build_vector_store(transcript : str)->Chroma:
 
     return vector_store
 
-
-
 def load_vector_store() ->Chroma:
     embeddings = get_embeddings()
     vector_store = Chroma(
@@ -61,5 +55,3 @@ def get_retriever(vector_store : Chroma, k :int = 4):
         search_type = 'similarity',
         search_kwargs = {"k":k}
     )
-
-
