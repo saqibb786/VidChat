@@ -481,6 +481,20 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+
+.chat-input-row .form-input {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.chat-input-row .btn-primary {
+  width: auto !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  padding: 0.65rem 1.25rem !important;
 }
 
 /* Custom Scrollbars */

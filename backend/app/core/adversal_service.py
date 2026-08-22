@@ -163,12 +163,18 @@ def parse_adversal_notes(output_dir: str) -> dict:
         else:
             summary += f"\n\n### {lines[0]}\n{sec_body}"
 
-    if not action_items:
-        action_items = "Extracted practical takeaways and key insights from the Cloud analysis."
-    if not key_decisions:
-        key_decisions = "Core conclusions and central principles established in the video."
-    if not open_questions:
-        open_questions = "Key themes and analytical framing for further reflection."
+    if not action_items.strip():
+        takeaway_bullets = [line for line in content.splitlines() if line.strip().startswith(('- ', '* ', '1.', '2.', '3.', '4.', '5.'))]
+        if takeaway_bullets:
+            action_items = "### Practical Takeaways & Highlights\n" + "\n".join(takeaway_bullets[:8])
+        else:
+            action_items = "### Key Takeaways\n- Synthesized technical concepts and practical insights from the video analysis.\n- Key core principles established in the media content."
+
+    if not key_decisions.strip():
+        key_decisions = "### Core Principles & Conclusions\n- Central principles and technical conclusions established in the video."
+
+    if not open_questions.strip():
+        open_questions = "### Analytical Themes & Follow-ups\n- Primary themes and analytical framing for further study."
 
     return {
         "title": title,

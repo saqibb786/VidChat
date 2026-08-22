@@ -23,7 +23,7 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
           <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.95rem', color: '#ffffff' }}>
-            💬 Chat with Meeting
+            💬 Chat with Video
           </span>
           <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontFamily: 'JetBrains Mono, monospace' }}>
             RAG Active
@@ -36,7 +36,7 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
             <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-muted)' }}>
               <div style={{ fontSize: '2.5rem' }}>💬</div>
               <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                {sessionId ? 'Ask any question about your meeting transcript.' : 'Analyze a media file to start chatting.'}
+                {sessionId ? 'Ask any question about your video transcript.' : 'Analyze a media file to start chatting.'}
               </div>
             </div>
           ) : (
@@ -67,8 +67,8 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
           <input
             type="text"
             className="form-input"
-            style={{ flex: 1 }}
-            placeholder={sessionId ? "Ask about specific topics, owners, decisions..." : "Analyze media to unlock chat..."}
+            style={{ flex: 1, minWidth: 0 }}
+            placeholder={sessionId ? "Ask about key concepts, specific timestamps, or details..." : "Analyze media to unlock chat..."}
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
             disabled={isAsking || !sessionId}
@@ -76,7 +76,7 @@ export default function ChatBox({ chatHistory, onSendMessage, isAsking, sessionI
           <button
             type="submit"
             className="btn-primary"
-            style={{ padding: '0.65rem 1.25rem' }}
+            style={{ padding: '0.65rem 1.25rem', width: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}
             disabled={isAsking || !inputQuery.trim() || !sessionId}
           >
             Send →
